@@ -1,3 +1,6 @@
+# docker及docker-compose安装及说明
+请参考: https://yeasy.gitbooks.io/docker_practice/compose
+
 # 安装
 ```
 cd ~/
@@ -33,7 +36,7 @@ php:
 # 编辑开机启动文件
 # 注意这里不用 sudo，本身是使用 root 运行的
 $ sudo vim /etc/rc.local
-/usr/bin/docker-compose -f /root/docker-lnmp/docker-compose.yml up -d
+/usr/local/bin/docker-compose -f /root/docker-lnmp/docker-compose.yml up -d
 # 重启测试
 $ sudo reboot
 ```
@@ -69,4 +72,7 @@ sudo docker rm $(docker ps -a -q)
 
 # 删除所有镜像，-f 可以强制删除
 sudo docker rmi $(docker images -q)
+
+// 删除none等无用的镜像
+sudo docker image prune -f
 ```
