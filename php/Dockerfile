@@ -1,46 +1,203 @@
-FROM php:7.0-fpm
-
-ENV TZ=Asia/Shanghai
-
+FROM php:7.2-fpm as builder
 COPY ./sources.list /etc/apt/sources.list
+RUN set -ex; \
+    \
+    apt-get update; \
+    apt-get install -y \
+    autoconf \
+    build-essential \
+    libbsd-dev \
+    libbz2-dev \
+    libc-client2007e-dev \
+    libc-dev \
+    libcurl3 \
+    libcurl3-dev \
+    libcurl4-openssl-dev \
+    libedit-dev \
+    libedit2 \
+    libgmp-dev \
+    libicu-dev \
+    libjpeg-dev \
+    libkrb5-dev \
+    libldap2-dev \
+    libmagick++-dev \
+    libmagickwand-dev \
+    libmemcached-dev \
+    libpcre3-dev \
+    libpng-dev \
+    libsqlite3-0 \
+    libsqlite3-dev \
+    libssh2-1-dev \
+    libssl-dev \
+    libtinfo-dev \
+    libtool \
+    libwebp-dev \
+    libxml2 \
+    libxml2-dev \
+    libxpm-dev \
+    libxslt1-dev \
+    ; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*; \
+    \
+    docker-php-ext-configure gd \
+    --with-png-dir=/usr \
+    --with-jpeg-dir=/usr \
+    --with-freetype-dir=/usr \
+    --with-xpm-dir=/usr \
+    --with-webp-dir=/usr \
+    --with-vpx-dir=/usr; \
+    docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
+    docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu; \
+    docker-php-ext-install \
+    bcmath \
+    bz2 \
+    calendar \
+    dba \
+    exif \
+    gd \
+    gettext \
+    gmp \
+    imap \
+    intl \
+    ldap \
+    mysqli \
+    opcache \
+    pdo_mysql \
+    shmop \
+    soap \
+    sockets \
+    sysvmsg \
+    sysvsem \
+    sysvshm \
+    wddx \
+    xmlrpc \
+    xsl \
+    zip \
+    ; \
+    pecl install \
+    igbinary-2.0.1 \
+    imagick-3.4.3 \
+    memcached-3.0.3 \
+    msgpack-2.0.2 \
+    redis-3.1.3 \
+    uopz-5.0.2 \
+    ; \
+    echo "\n" | pecl install ssh2-1.1.2; \
+    docker-php-ext-enable --ini-name pecl.ini \
+    igbinary \
+    imagick \
+    memcached \
+    msgpack \
+    redis \
+    ssh2 \
+    uopz \
+    ;
 
-RUN apt-get update \
-    && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd \
-    && :\
-    && apt-get install -y libicu-dev \
-    && docker-php-ext-install intl \
-    && :\
-    && apt-get install -y libxml2-dev \
-    && apt-get install -y libxslt-dev \
-    && docker-php-ext-install soap \
-    && docker-php-ext-install xsl \
-    && docker-php-ext-install xmlrpc \
-    && docker-php-ext-install wddx \
-    && :\
-    && apt-get install -y libbz2-dev \
-    && docker-php-ext-install bz2 \
-    && :\
-    && docker-php-ext-install zip \
-    && docker-php-ext-install pcntl \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install mbstring \
-    && docker-php-ext-install exif \
-    && docker-php-ext-install bcmath \
-    && docker-php-ext-install calendar \
-    && docker-php-ext-install sockets \
-    && docker-php-ext-install gettext \
-    && docker-php-ext-install shmop \
-    && docker-php-ext-install sysvmsg \
-    && docker-php-ext-install sysvsem \
-    && docker-php-ext-install sysvshm \
-    && docker-php-ext-install opcache
+RUN set -ex; \
+    \
+    NR_VERSION="$( \
+    curl --connect-timeout 10 -skS https://download.newrelic.com/php_agent/release/ \
+    | sed -n 's/.*>\(.*linux\).tar.gz<.*/\1/p' \
+    )"; \
+    curl --connect-timeout 10 -o nr.tar.gz -fkSL "https://download.newrelic.com/php_agent/release/$NR_VERSION.tar.gz"; \
+    tar -xf nr.tar.gz; \
+    cp $NR_VERSION/agent/x64/newrelic-20170718.so /usr/local/lib/php/extensions/no-debug-non-zts-20170718/newrelic.so; \
+    mkdir -p /var/log/newrelic; \
+    rm -rf newrelic-php5* nr.tar.gz; \
+    echo "extension=newrelic.so" > /usr/local/etc/php/conf.d/newrelic.ini;
 
-# Composer
-RUN php -r "copy('https://install.phpcomposer.com/installer', 'composer-setup.php');" \
-    && php composer-setup.php \
-    && php -r "unlink('composer-setup.php');" \
-    && mv composer.phar /bin/composer \
-    && composer config -g repo.packagist composer https://packagist.phpcomposer.com
+RUN set -ex; \
+    \
+    curl --connect-timeout 10 -o ioncube.tar.gz -fkSL "https://www.ioncube.com/php-7.2.0-beta-loaders/ioncube_loaders_lin_x86-64_BETA.tar.gz"; \
+    tar -zxvf ioncube.tar.gz; \
+    cp ioncube_loader_lin_7.2_10.1.0_beta.so /usr/local/lib/php/extensions/no-debug-non-zts-20170718/ioncube.so; \
+    rm -Rf ioncube*; \
+    echo "zend_extension=ioncube.so" > /usr/local/etc/php/conf.d/01-ioncube.ini;
+
+# Now that all the modules are built/downloaded, use the original php:7.2-fpm image and
+# install only the runtime dependencies with the new modules and config files.
+FROM php:7.2-fpm
+
+WORKDIR /
+
+RUN set -ex ; \
+    \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libc-client2007e \
+    libicu57 \
+    libmagickwand-6.q16-3 \
+    libmcrypt4 \
+    libmemcached11 \
+    libmemcachedutil2 \
+    libvpx-dev \
+    libwebp-dev \
+    libxpm-dev \
+    libxslt1.1 \
+    ssmtp \
+    libpng16-16 \
+    ; \
+    rm -rf /tmp/pear /usr/share/doc /usr/share/man /usr/lib/gcc /var/lib/apt/lists/*; \
+    cd /usr/local/etc/php; \
+    php-fpm -v 2>/dev/null | sed -E 's/PHP ([5|7].[0-9]{1,2}.[0-9]{1,2})(.*)/\1/g' | head -n1 > php_version.txt;
+
+COPY --from=builder /usr/local/lib/php/extensions/no-debug-non-zts-20170718/ /usr/local/lib/php/extensions/no-debug-non-zts-20170718/
+COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
+
+RUN pear install --alldeps \
+    Auth_SASL \
+    Auth_SASL2-beta \
+    Benchmark \
+    pear.php.net/Console_Color2-0.1.2 \
+    Console_Table \
+    HTTP_OAuth-0.3.1 \
+    HTTP_Request2 \
+    Log \
+    Mail \
+    MDB2 \
+    Net_GeoIP \
+    Net_SMTP \
+    Net_Socket \
+    XML_RPC2 \
+    pear.symfony.com/YAML \
+    ;
+
+RUN set -ex \
+    && { \
+    echo '[global]'; \
+    echo 'daemonize = no'; \
+    echo 'error_log = /proc/self/fd/2'; \
+    echo; \
+    echo '[www]'; \
+    echo 'listen = [::]:9000'; \
+    echo 'listen.owner = www-data'; \
+    echo 'listen.group = www-data'; \
+    echo; \
+    echo 'user = www-data'; \
+    echo 'group = www-data'; \
+    echo; \
+    echo 'access.log = /proc/self/fd/2'; \
+    echo; \
+    echo 'pm = static'; \
+    echo 'pm.max_children = 1'; \
+    echo 'pm.start_servers = 1'; \
+    echo 'request_terminate_timeout = 65s'; \
+    echo 'pm.max_requests = 1000'; \
+    echo 'catch_workers_output = yes'; \
+    } | tee /usr/local/etc/php-fpm.d/www.conf \
+    && { \
+    echo 'FromLineOverride=YES'; \
+    echo 'mailhub=127.0.0.1'; \
+    echo 'UseTLS=NO'; \
+    echo 'UseSTARTTLS=NO'; \
+    } | tee /etc/ssmtp/ssmtp.conf \
+    && { \
+    echo '[PHP]'; \
+    echo 'log_errors = On'; \
+    echo 'error_log = /dev/stderr'; \
+    } | tee /usr/local/etc/php/conf.d/php.ini \
+    ;
+
+EXPOSE 9000
+
+CMD ["php-fpm"]
