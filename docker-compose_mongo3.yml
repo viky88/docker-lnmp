@@ -1,0 +1,14 @@
+version: '3'
+services:
+  mongo3:
+    image: mongo:3
+    container_name: mongo3
+    #restart: always
+    ports:
+      - 27019:27017
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - /Users/viky/mongodb/db3:/data/db
+    # command: [--auth]

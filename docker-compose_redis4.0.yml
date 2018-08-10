@@ -1,0 +1,10 @@
+version: '3'
+# 定义四个服务nginx,php,mysql
+services:
+  redis4.0:
+    image: redis:4.0
+    container_name: redis4.0
+    volumes:
+      - ./redis/data:/data
+    ports:
+      - "6380:6379"

@@ -1,2 +1,5 @@
 mysql/data*
+nginx/conf/conf.d/servers*
+nginx/conf/conf.d/*.com.conf
 *.log
+*.rdb

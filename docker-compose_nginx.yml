@@ -1,0 +1,18 @@
+version: '3'
+# 定义四个服务nginx,php,mysql
+services:
+  nginx:
+      image : nginx:alpine
+      # 容器名称
+      container_name: nginx
+      # 这样使nginx容器把网站文件和目录存放到主机目录中，持久化和方便管理
+      volumes:
+        - /Users/viky/project/php:/var/www
+        - ./nginx/conf/conf.d/:/etc/nginx/conf.d/
+        - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+        - ./nginx/log/:/var/log/nginx/
+      # nginx意外退出时自动重启
+      # restart: always
+      # 依赖php服务，意味着在启动nginx之前先启动php
+      ports:
+        - "8082:80"

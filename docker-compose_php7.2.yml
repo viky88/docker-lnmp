@@ -1,0 +1,15 @@
+version: '3'
+# 定义四个服务nginx,php,mysql
+services:
+  php7.2:
+    image: wpengine/php:7.2
+    container_name: php7.2
+    volumes:
+      #- ./php/php-fpm.conf:/usr/local/php/etc/php-fpm.conf
+      #- ./php/www.conf:/usr/local/php/etc/php-fpm.d/www.conf
+      #- ./php/php.ini:/usr/local/php/etc/php.ini
+      #- ./php/log/php-fpm.log:/usr/local/php/var/log/php-fpm.log
+      - /Users/viky/project/php:/var/www  #此目录一定要跟nginx中配置的目录一样
+    # restart: always 
+    ports:
+      - "9001:9000"

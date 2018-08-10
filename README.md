@@ -23,7 +23,7 @@ php:
 改为：
 ```
 php:
-    image: viky88/php:v7.0.30
+    image: wpengine/php:7.2
 ```
 其他php版本可以自己编译好后，加入到 https://hub.docker.com/ 中
 
@@ -39,6 +39,22 @@ $ sudo vim /etc/rc.local
 /usr/local/bin/docker-compose -f /root/docker-lnmp/docker-compose.yml up -d
 # 重启测试
 $ sudo reboot
+```
+
+# alias 设置
+```
+# bash 修改 ~/.bash_profile  
+# zsh 修改 ~/.zshrc
+
+export DOCKERCOMPOS_EHOME=/Users/viky/project/docker/github/viky88/docker-lnmp
+alias godocker="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose.yml up -d"
+alias godocker_mongo3="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_mongo3.yml up -d"
+alias godocker_mongo4.0="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_mongo4.0.yml up -d"
+alias godocker_mysql5.7="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_mysql5.7.yml up -d"
+alias godocker_nginx="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_nginx.yml up -d"
+alias godocker_php7.2="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_php7.2.yml up -d"
+alias godocker_redis4.0="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_redis4.0.yml up -d"
+
 ```
 
 # docker常用命令
