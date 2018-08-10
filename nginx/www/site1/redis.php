@@ -9,6 +9,16 @@
    echo "Stored string in redis is " . $redis->get("abc");
 
 */
+/*
+require 'vendor/autoload.php';
+$redis = new Predis\Client([
+    'scheme' => 'tcp',
+    'host'   => 'redis',
+    'port'   => 6379,
+]);
+$redis->set('test','hello world!');
+echo $redis->get('test');
+*/
 echo 'test redis';
 $redis = new Redis();
 $redis->connect('redis',6379);
