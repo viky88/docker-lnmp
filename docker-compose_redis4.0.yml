@@ -1,10 +1,15 @@
-version: '3'
-# 定义四个服务nginx,php,mysql
+version: '3' 
 services:
-  redis4.0:
-    image: redis:4.0
+  redis:
+    image: redis:4.0-alpine
     container_name: redis4.0
     volumes:
       - ./redis/data:/data
     ports:
       - "6380:6379"
+    networks:
+      - backend 
+    sysctls:
+      net.core.somaxconn: '511' 
+networks:
+  backend: 

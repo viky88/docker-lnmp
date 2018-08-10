@@ -1,6 +1,6 @@
 version: '3'
 services:
-  mongo4.0:
+  mongo:
     image: mongo:4.0
     container_name: mongo4.0
     #restart: always
@@ -12,3 +12,7 @@ services:
     volumes:
       - /Users/viky/mongodb/db:/data/db
     command: [--auth]
+    networks:
+      - backend
+networks:
+  backend: 

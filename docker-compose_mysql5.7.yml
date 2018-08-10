@@ -1,5 +1,4 @@
-version: '3'
-# 定义四个服务nginx,php,mysql
+version: '3' 
 services:
   mysql5.7:
     image: mysql:5.7
@@ -12,3 +11,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 123456
     restart: always
+    networks:
+      - backend
+networks:
+  backend: 

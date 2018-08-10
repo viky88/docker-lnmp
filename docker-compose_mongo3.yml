@@ -12,3 +12,7 @@ services:
     volumes:
       - /Users/viky/mongodb/db3:/data/db
     # command: [--auth]
+    networks:
+      - backend
+networks:
+  backend: 

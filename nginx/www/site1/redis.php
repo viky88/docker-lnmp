@@ -9,8 +9,8 @@
    echo "Stored string in redis is " . $redis->get("abc");
 
 */
-
+echo 'test redis';
 $redis = new Redis();
-$redis->connect('redis',6380);
+$redis->connect('redis',6379);
 $redis->set('test','hello world!');
 echo $redis->get('test');
