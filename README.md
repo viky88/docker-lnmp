@@ -55,6 +55,8 @@ alias godocker_nginx="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docke
 alias godocker_php7.2="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_php7.2.yml up -d"
 alias godocker_redis4.0="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_redis4.0.yml up -d"
 
+alias godocker_elasticsearch5.6="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_elasticsearch5.6.yml up -d"
+
 ```
 
 # docker常用命令
@@ -71,6 +73,9 @@ sudo docker-compose up [NAME] -d
 # 停止和启动类似
 sudo docker-compose stop [NAME]
 
+# 停止所有正在运行的容器
+docker stop $(docker ps -q)
+
 # 停止所有容器
 sudo docker-compose kill
 
@@ -78,7 +83,7 @@ sudo docker-compose kill
 sudo docker-compose up -d --build 
 
 # 进入到某个镜像中
-sudo docker exec -ti [NAME] bash
+sudo docker exec -it [NAME] bash
 
 # 删除已经停止的容器
 sudo docker-compose rm  [NAME]  
@@ -89,6 +94,12 @@ sudo docker rm $(docker ps -a -q)
 # 删除所有镜像，-f 可以强制删除
 sudo docker rmi $(docker images -q)
 
-// 删除none等无用的镜像
+# 删除none等无用的镜像
 sudo docker image prune -f
+
+# 查看容易的详细信息
+docker inspect [NAME]/[CONTAINER ID]
+
+# 宿主机器重启docker内部复制内容
+docker cp /path/file [NAME/CONTAINER ID]:/path/file
 ```

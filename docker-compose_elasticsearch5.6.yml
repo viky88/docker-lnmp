@@ -1,0 +1,81 @@
+version: '3' 
+# 参考： https://www.elastic.co/guide/en/elasticsearch/reference/5.6/docker.html
+services:
+  elasticsearch1:
+    #image: docker.elastic.co/elasticsearch/elasticsearch:5.6.10
+    image: elasticsearch:5.6.10
+    container_name: elasticsearch5.6_1
+    environment: 
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1 
+    volumes:
+      - ./elasticsearch/5.6/elasticsearch_master.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./common/ubuntu/etc/apt/sources.list:/etc/apt/sources.list
+      - esdata1:/usr/share/elasticsearch/data 
+    ports:
+      - "9200:9200"
+    networks:
+      - esnet
+  
+
+  elasticsearch2:
+    image: elasticsearch:5.6.10
+    container_name: elasticsearch5.6_2
+    environment: 
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" 
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1 
+    volumes:
+      - ./elasticsearch/5.6/elasticsearch_node1.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./common/ubuntu/etc/apt/sources.list:/etc/apt/sources.list
+      - esdata2:/usr/share/elasticsearch/data 
+    networks:
+      - esnet
+
+  elasticsearch-head5: 
+    image: mobz/elasticsearch-head:5-alpine
+    container_name: elasticsearch-head5
+    volumes:
+      - ./common/ubuntu/etc/apt/sources.list:/etc/apt/sources.list
+    ports:
+      - "9100:9100" 
+    networks:
+      - esnet  
+
+  # 参考：https://www.elastic.co/guide/cn/kibana/current/docker.html
+  #      https://github.com/docker-library/kibana/blob/c59bd9585cbe6d62e1bd56c7975d2eb350dc11fb/5/Dockerfile
+  kibana:
+    image: kibana:5.6.10
+    container_name: kibana5.6
+    volumes:
+      - ./common/ubuntu/etc/apt/sources.list:/etc/apt/sources.list
+      - ./elasticsearch/5.6/kibana.yml:/etc/kibana/kibana.yml
+    ports:
+      - "5601:5601" 
+    networks:
+      - esnet  
+
+
+volumes:
+  esdata1:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/viky/project/docker/data/elasticsearch5.6/data1
+  esdata2:
+    driver: local
+    driver_opts: 
+      type: none
+      o: bind
+      device: /Users/viky/project/docker/data/elasticsearch5.6/data2
+
+networks:
+  esnet:
