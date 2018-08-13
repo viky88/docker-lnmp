@@ -55,8 +55,6 @@ alias godocker_nginx="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docke
 alias godocker_php7.2="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_php7.2.yml up -d"
 alias godocker_redis4.0="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_redis4.0.yml up -d"
 
-alias godocker_elasticsearch5.6="/usr/local/bin/docker-compose -f $DOCKERCOMPOS_EHOME/docker-compose_elasticsearch5.6.yml up -d"
-
 ```
 
 # docker常用命令

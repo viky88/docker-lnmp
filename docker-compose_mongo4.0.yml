@@ -10,9 +10,9 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
-      - /Users/viky/mongodb/db:/data/db
+      - /Users/viky/mongodb/db4:/data/db
     command: [--auth]
     networks:
-      - backend
+      - backend 
 networks:
-  backend: 
+  backend:  
