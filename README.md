@@ -12,20 +12,17 @@ cd docker-lnmp
 2. 修改 docker-compose.yum 中mysql密码，如果不需要安装mysql，将mysql部分注释掉
    MYSQL_ROOT_PASSWORD: 123456
 
+# docker-compse 在centos7.2下安装会报错
+/usr/lib/python2.7/site-packages/requests/__init__.py:80: RequestsDependencyWarning: urllib3 (1.22) or chardet (2.2.1) doesn't match a supported version!
+
+解决方案：
+pip uninstall urllib3
+pip uninstall chardet
+pip install requests
 ```
 
 # 说明
-php的build会比较慢(添加扩展)，可以直接拉取编译好的版本
-```
-php:
-    build: ./php
-```
-改为：
-```
-php:
-    image: wpengine/php:7.2
-```
-其他php版本可以自己编译好后，加入到 https://hub.docker.com/ 中
+php版本可以自己编译好后，加入到 https://hub.docker.com/ 中
 
 如果只想要nginx+php，只需要将mysql部分注释掉即可   
 同理，如果只想要mysql，只需要将nginx+php部分注释掉即可
